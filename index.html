@@ -4,9 +4,8 @@
 <meta charset="UTF-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="generator" content="Asciidoctor 2.0.1">
-<meta name="author" content="José Lenildo Fernandes Dantas Júnior &lt;lenildo.ze@gmail.com&gt;">
-<title>Projetos - Processamento Digital de Imagens</title>
+<meta name="generator" content="Asciidoctor 2.0.6">
+<title>Programas de PDI</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300,300italic,400,400italic,600,600italic%7CNoto+Serif:400,400italic,700,700italic%7CDroid+Sans+Mono:400,700">
 <style>
 /* Asciidoctor default stylesheet | MIT License | https://asciidoctor.org */
@@ -436,582 +435,518 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 @media amzn-kf8{#header,#content,#footnotes,#footer{padding:0}}
 </style>
 </head>
-<body class="article toc2 toc-left">
+<body class="article">
 <div id="header">
-<h1>Projetos - Processamento Digital de Imagens</h1>
-<div class="details">
-<span id="author" class="author">José Lenildo Fernandes Dantas Júnior &lt;lenildo.ze@gmail.com&gt;</span><br>
-</div>
-<div id="toc" class="toc2">
-<div id="toctitle">Sumário</div>
-<ul class="sectlevel1">
-<li><a href="#_projetos_da_primeira_unidade">Projetos da Primeira Unidade</a></li>
-<li><a href="#_manipulação_de_pixels">1. Manipulação de Pixels</a>
-<ul class="sectlevel2">
-<li><a href="#_negativo_de_uma_região">1.1. Negativo de uma região</a></li>
-<li><a href="#_troca_de_regiões">1.2. Troca de Regiões</a></li>
-</ul>
-</li>
-<li><a href="#_contando_objetos_de_uma_imagem">2. Contando objetos de uma imagem</a></li>
-<li><a href="#_manipulação_de_histogramas">3. Manipulação de Histogramas</a>
-<ul class="sectlevel2">
-<li><a href="#_equalização">3.1. Equalização</a></li>
-<li><a href="#_detecção_de_movimentos">3.2. Detecção de movimentos</a></li>
-</ul>
-</li>
-<li><a href="#_filtro_espacial">4. Filtro espacial</a>
-<ul class="sectlevel2">
-<li><a href="#_filtro_laplaciano_do_gaussiano">4.1. Filtro Laplaciano do Gaussiano</a></li>
-</ul>
-</li>
-</ul>
-</div>
+<h1>Programas de PDI</h1>
 </div>
 <div id="content">
 <div class="sect1">
-<h2 id="_projetos_da_primeira_unidade">Projetos da Primeira Unidade</h2>
+<h2 id="_2_manipulação_de_pixels_de_uma_imagem">2. Manipulação de pixels de uma imagem</h2>
 <div class="sectionbody">
+<div class="sect2">
+<h3 id="_2_2_exercício">2.2. Exercício</h3>
+<div class="sect3">
+<h4 id="_2_2_1_regions_cpp">2.2.1. Regions.cpp</h4>
+<div class="paragraph">
+<p>Esse exercício consiste em tornar negativa uma região definida como parâmetro de uma imagem de entrada também fornecida como parâmetro. O exemplo usou a image do <a href="/imagens/biel.png"><strong><em>Biel</em></strong></a> e os vértices opostos (100,100) e (200,200) que formarão a região retangular a ser negativada.</p>
+</div>
+<div class="paragraph">
+<p>O código fonte do programa pode ser visto abaixo: <a href="/codes/regions.cpp">regions.cpp</a></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-cpp" data-lang="cpp">//make regions
+//./regions nome_imagem xmin ymin xmax ymax
+#include &lt;iostream&gt;
+#include &lt;opencv2/opencv.hpp&gt;
+using namespace cv;
 
+int main(int argc, char** argv){
+  Mat image;
+  int xmin, ymin, xmax, ymax;
+
+  CvPoint p;
+  image = imread(argv[1],CV_LOAD_IMAGE_GRAYSCALE);
+  if(!image.data){
+    std::cout &lt;&lt; "imagem nao carregou corretamente\n";
+    return(-1);
+  }
+  xmin = atoi(argv[2]);
+  ymin = atoi(argv[3]);
+  xmax = atoi(argv[4]);
+  ymax = atoi(argv[5]);
+
+  if(xmin&lt;0||xmax&gt;image.size().width||ymin&lt;0||ymax&gt;image.size().height||xmax&lt;xmin||ymax&lt;ymin){
+    std::cout &lt;&lt; "Parâmetros inválidos, escolha pontos dentro da largura da imagem\n";
+    return 0;
+  }
+
+  for(int i=xmin; i&lt;xmax; i++){
+    for(int j=ymin; j&lt;ymax; j++){
+      image.at&lt;uchar&gt;(i,j)=(unsigned char)(256-(int)image.at&lt;uchar&gt;(i,j));
+    }
+  }
+
+  imshow("Processada", image);
+  imwrite("negativo.png", image);
+
+  waitKey();
+  return 0;
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>E os comandos a serem usados para compilar e executar o exemplo podem ser vistos abaixo</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-markdown" data-lang="markdown">make regions
+./regions biel.png 100 100 200 200</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Usando como imagem de entrada o <a href="/imagens/biel.png"><strong><em>Biel</em></strong></a></p>
+</div>
+<div class="paragraph">
+<p><span class="image"><img src="/OpenCV/imagens/biel.png" alt="Biel"></span></p>
+</div>
+<div class="paragraph">
+<p>e executando o programa, obtemos a imagem <a href="/imagens/negativo.png"><strong><em>Negativo</em></strong></a> abaixo</p>
+</div>
+<div class="paragraph">
+<p><span class="image"><img src="/imagens/negativo.png" alt="Negativo"></span></p>
+</div>
+<div class="paragraph">
+<p>Para entender o código vamos observa-lo por parte:
+O código possui uma parte onde inicializamos as variáveis a serem usadas, tenta abrir o arquivo de imagem e verifica se foi aberto com sucesso.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-cpp" data-lang="cpp">  Mat image;
+  int xmin, ymin, xmax, ymax;
+
+  CvPoint p;
+  image = imread(argv[1],CV_LOAD_IMAGE_GRAYSCALE);
+  if(!image.data){
+    std::cout &lt;&lt; "imagem nao carregou corretamente\n";
+    return(-1);
+  }</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Após isso ele instancia as coordenadas dos vértices que definem o retângulo a ser negativado.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-cpp" data-lang="cpp">  xmin = atoi(argv[2]);
+  ymin = atoi(argv[3]);
+  xmax = atoi(argv[4]);
+  ymax = atoi(argv[5]);</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>E então ele verifica a validade das coordenadas escolhidas</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-cpp" data-lang="cpp">  if(xmin&lt;0||xmax&gt;image.size().width||ymin&lt;0||ymax&gt;image.size().height||xmax&lt;xmin||ymax&lt;ymin){
+    std::cout &lt;&lt; "Parâmetros inválidos, escolha pontos dentro da largura da imagem\n";
+    return 0;
+  }</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>E por fim, nesse trecho ele executa a negação para imprimir e salvar a imagem com a área negativada.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-cpp" data-lang="cpp">  for(int i=xmin; i&lt;xmax; i++){
+    for(int j=ymin; j&lt;ymax; j++){
+      image.at&lt;uchar&gt;(i,j)=(unsigned char)(256-(int)image.at&lt;uchar&gt;(i,j));
+    }
+  }
+
+  imshow("Processada", image);
+  imwrite("negativo.png", image);</code></pre>
+</div>
+</div>
+</div>
+</div>
 </div>
 </div>
 <div class="sect1">
-<h2 id="_manipulação_de_pixels">1. Manipulação de Pixels</h2>
+<h2 id="_3_preenchimento_de_regiões">3. Preenchimento de Regiões</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="_negativo_de_uma_região">1.1. Negativo de uma região</h3>
+<h3 id="_3_2_exercício">3.2. Exercício</h3>
+<div class="sect3">
+<h4 id="_3_2_1_labeling_cpp">3.2.1 Labeling.cpp</h4>
 <div class="paragraph">
-<p>Este exercício tem como finalidade manipular uma determinada imagem de forma que, após receber duas coordeandas (x,y) que representam, respectivamente, o ponto inicial e final da área desejada, forme um retângulo onde será aplicado o negativo da imagem.</p>
-</div>
-<div class="imageblock">
-<div class="content">
-<img src="/image/Retangulo.png" alt="Retangulo">
-</div>
-<div class="title">Figure 1. Área criada com os pontos</div>
+<p>Esse exercício consiste na contagem de bolhas com furos que não estão nas bordas da imagem. O número de bolhas e bolhas com furos é exibido no terminal e o bolhas com mais de um furo são contadas como somente uma bolha com furo. O exemplo usou as imagens <a href="/imagens/bolhas.png"><strong><em>Bolhas</em></strong></a> que contém 32 bolhas e 7 com furos e <a href="/imagens/furos.png"><strong><em>Furos</em></strong></a> com 262 bolhas sendo 8 com furos para conta-las.</p>
 </div>
 <div class="paragraph">
-<p>O conceito e negativo de uma imagem está atrelado ao fato de acessar os pixels da imagem e subtrair dele o valor máximo que ele pode assunmir. No caso deste exercício, estaremos utilizando uma imagem em tons de cinza com armazenamento de 1 byte, ou seja, cada pixel pode assumir valores entre 0 e 255. Com isso o negativo da imagem pode ser definido como</p>
+<p>O código fonte do programa pode ser visto abaixo: <a href="/codes/labeling.cpp">labeling.cpp</a></p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlight"><code class="language-cpp" data-lang="cpp">image.at&lt;uchar&gt;(i,j)=255-image.at&lt;uchar&gt;(i,j);</code></pre>
+<pre class="highlight"><code class="language-cpp" data-lang="cpp">//make labeling
+//./labeling bolhas.png
+#include &lt;iostream&gt;
+#include &lt;opencv2/opencv.hpp&gt;
+using namespace cv;
+
+//saturação =&gt; direção da luz;
+
+int main(int argc, char** argv){
+  Mat image, save;
+  int width, height;
+  int nobjects, fundo, furo;
+
+  CvPoint p;
+  image = imread(argv[1],CV_LOAD_IMAGE_GRAYSCALE);
+  save = imread(argv[1],CV_LOAD_IMAGE_GRAYSCALE);
+  if(!image.data||!save.data){
+    std::cout &lt;&lt; "imagem nao carregou corretamente\n";
+    return(-1);
+  }
+  width=image.size().width;
+  height=image.size().height;
+
+  p.x=0;
+  p.y=0;
+
+  // busca objetos presentes
+  nobjects=0;
+  furo=0;
+  //std::cout &lt;&lt; (int)image.at&lt;uchar&gt;(0,width-1) &lt;&lt; std::endl;
+  for(int i=0; i&lt;height; i++){
+    for(int j=0; j&lt;width; j++){
+      if(image.at&lt;uchar&gt;(i,j) == 255){//############
+		// achou um objeto
+		//std::cout &lt;&lt; image.at&lt;int&gt;(i,j) &lt;&lt; std::endl;
+		nobjects++;
+		p.x=j;
+		p.y=i;
+		floodFill(image,p,(nobjects%254));
+      }
+    }
+  }
+  fundo=254;
+  printf("Tem %d bolhas\n", nobjects);
+
+  // eliminando as bolhas da borda de cima
+  p.y=0;
+  for(int i=0; i&lt;width; i++){
+    if(image.at&lt;uchar&gt;(p.y,i) != 0){ //###############
+      nobjects--;
+      p.x=i;
+      floodFill(image,p,0);
+    }
+  }
+  //printf("Agora tem %d objetos\n", nobjects);
+  // eliminando as bolhas da borda de baixo
+  p.y=height-1;
+  for(int i=0; i&lt;width; i++){
+    if(image.at&lt;uchar&gt;(p.y,i) != 0){//#############
+      nobjects--;
+      p.x=i;
+      floodFill(image,p,0);
+    }
+  }
+  //printf("Agora tem %d objetos\n", nobjects);
+  // eliminando as bolhas da borda da esquerda
+  p.x=0;
+  for(int i=0; i&lt;height; i++){
+    if(image.at&lt;uchar&gt;(i,p.x) != 0){//##########
+      nobjects--;
+      p.y=i;
+      floodFill(image,p,0);
+    }
+  }
+  //printf("Agora tem %d objetos\n", nobjects);
+  // eliminando as bolhas da borda da direita
+  p.x=width-1;
+  for(int i=0; i&lt;height; i++){
+    if(image.at&lt;uchar&gt;(i,p.x) != 0){//#############
+      nobjects--;
+      p.y=i;
+      floodFill(image,p,0);
+    }
+  }
+  //printf("Agora tem %d objetos\n", nobjects);
+
+  //achando buracos
+  p.x=0;p.y=0;
+  floodFill(image,p,fundo);
+  for(int i=0; i&lt;height; i++){
+    for(int j=0; j&lt;width; j++){
+      if(image.at&lt;uchar&gt;(i,j) == 0){//############
+	if(image.at&lt;uchar&gt;(i-1,j) !=fundo){//##########
+	  furo++;
+	  p.x=j;
+	  p.y=i;
+	  floodFill(image,p,fundo);
+	  p.x--;
+	  floodFill(image,p,fundo);
+	}
+	else{
+	  p.x=j;
+	  p.y=i;
+	  floodFill(image,p,fundo);
+	}
+      }
+    }
+  }
+  printf("Tem %d bolhas com buracos\n", furo);
+
+  // exibindo
+  imshow("Original", save);
+  imshow("Processada", image);
+  imwrite("labeling.png", image);
+
+  waitKey();
+  return 0;
+}</code></pre>
 </div>
 </div>
 <div class="paragraph">
-<p>onde:</p>
-</div>
-<div class="ulist">
-<ul>
-<li>
-<p><strong><em>image</em></strong> : Refere-se a imagem manipulada</p>
-</li>
-<li>
-<p><strong><em>.at&lt;uchar&gt;</em></strong> : Método para acesso aos pixels de um <em>unsigned char</em> (&lt;uchar&gt;) com 1 <em>byte</em> de tamanho</p>
-</li>
-<li>
-<p><strong><em>(i,j)</em></strong> : Representam as coordenadas (x,y) do pixel</p>
-</li>
-</ul>
-</div>
-<div class="paragraph">
-<p>Para aplicar este efeito em toda a imagem, basta acrescentá-la a um laço <em>for()</em> como mostra o trecho do código</p>
+<p>Para compilar e executar o programa usamos os comandos abaixo substituindo imagem.png pelo nome da imagem em que serão procurados as bolhas e os furos.</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlight"><code class="language-cpp" data-lang="cpp">for(int i=p1x;i&lt;p2x;i++){
-    for(int j=p1y;j&lt;p2y;j++){
-      image.at&lt;uchar&gt;(i,j)=255-image.at&lt;uchar&gt;(i,j);
+<pre class="highlight"><code class="language-markdown" data-lang="markdown">make labeling
+./labeling imagem.png</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Executando o programa com <a href="/imagens/bolhas.png">Bolhas</a> temos o seguinte resultado:</p>
+</div>
+<div class="paragraph">
+<p><span class="image"><img src="/imagens/bolhas.png" alt="Bolhas"></span></p>
+</div>
+<div class="paragraph">
+<p>e o resultado obtido é <a href="imagens/bolhas_labeling.png">Bolhas Labeling</a></p>
+</div>
+<div class="paragraph">
+<p><span class="image"><img src="/imagens/bolhas_labeling.png" alt="Bolhas Labeling"></span></p>
+</div>
+<div class="paragraph">
+<p>E executando o programa com <a href="/imagens/furos.png">Furos</a> temos o seguinte resultado:</p>
+</div>
+<div class="paragraph">
+<p><span class="image"><img src="/imagens/furos.png" alt="Furos"></span></p>
+</div>
+<div class="paragraph">
+<p>e como resultado obtemos <a href="imagens/furos_labeling.png">Furos Labeling</a></p>
+</div>
+<div class="paragraph">
+<p><span class="image"><img src="/imagens/furos_labeling.png" alt="Furos Labeling"></span></p>
+</div>
+<div class="paragraph">
+<p>O programa se divide em inicialização das variáveis</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-cpp" data-lang="cpp">  Mat image, save;
+  int width, height;
+  int nobjects, fundo, furo;
+
+  CvPoint p;
+  image = imread(argv[1],CV_LOAD_IMAGE_GRAYSCALE);
+  save = imread(argv[1],CV_LOAD_IMAGE_GRAYSCALE);
+  if(!image.data||!save.data){
+    std::cout &lt;&lt; "imagem nao carregou corretamente\n";
+    return(-1);
+  }
+  width=image.size().width;
+  height=image.size().height;
+
+  p.x=0;
+  p.y=0;
+  nobjects=0;
+  furo=0;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>e em seguida o programa procura as bolhas.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-cpp" data-lang="cpp">for(int i=0; i&lt;height; i++){
+  for(int j=0; j&lt;width; j++){
+    if(image.at&lt;uchar&gt;(i,j) == 255){//############
+      // achou um objeto
+      //std::cout &lt;&lt; image.at&lt;int&gt;(i,j) &lt;&lt; std::endl;
+      nobjects++;
+      p.x=j;
+      p.y=i;
+      floodFill(image,p,(nobjects%254));
+    }
+  }
+}
+fundo=254;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Para contar as bolhas, o programa consigera que o fundo tem cor 0 (preto) e procura as bolhas com cor branca. Ao achar uma bolha, o número de objetos é incrementado e a bolha encontrada é pintada da cor correspondente na escala de cinza. Ao final o a cor de fundo é definida como 254, que é o nível que as bolhas não são pintadas.</p>
+</div>
+<div class="listingblock">
+<div class="title">Depois da contagem de bolhas, as bolhas das bordas são eliminadas, pois não podemos afirmar se possuem furos ou se são bolhas que aparecem em mais de uma parte da borda.</div>
+<div class="content">
+<pre class="highlight"><code class="language-cpp" data-lang="cpp">p.y=0;
+  for(int i=0; i&lt;width; i++){
+    if(image.at&lt;uchar&gt;(p.y,i) != 0){ //###############
+      nobjects--;
+      p.x=i;
+      floodFill(image,p,0);
+    }
+  }
+  //printf("Agora tem %d objetos\n", nobjects);
+  // eliminando as bolhas da borda de baixo
+  p.y=height-1;
+  for(int i=0; i&lt;width; i++){
+    if(image.at&lt;uchar&gt;(p.y,i) != 0){//#############
+      nobjects--;
+      p.x=i;
+      floodFill(image,p,0);
+    }
+  }
+  //printf("Agora tem %d objetos\n", nobjects);
+  // eliminando as bolhas da borda da esquerda
+  p.x=0;
+  for(int i=0; i&lt;height; i++){
+    if(image.at&lt;uchar&gt;(i,p.x) != 0){//##########
+      nobjects--;
+      p.y=i;
+      floodFill(image,p,0);
+    }
+  }
+  //printf("Agora tem %d objetos\n", nobjects);
+  // eliminando as bolhas da borda da direita
+  p.x=width-1;
+  for(int i=0; i&lt;height; i++){
+    if(image.at&lt;uchar&gt;(i,p.x) != 0){//#############
+      nobjects--;
+      p.y=i;
+      floodFill(image,p,0);
+    }
+  }
+  //printf("Agora tem %d objetos\n", nobjects);</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Por fim contamos o número de bolhas com furos através das verificaçes abaixo</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-cpp" data-lang="cpp">p.x=0;p.y=0;
+  floodFill(image,p,fundo);
+  for(int i=0; i&lt;height; i++){
+    for(int j=0; j&lt;width; j++){
+      if(image.at&lt;uchar&gt;(i,j) == 0){//############
+	if(image.at&lt;uchar&gt;(i-1,j) !=fundo){//##########
+	  furo++;
+	  p.x=j;
+	  p.y=i;
+	  floodFill(image,p,fundo);
+	  p.x--;
+	  floodFill(image,p,fundo);
+	}
+	else{
+	  p.x=j;
+	  p.y=i;
+	  floodFill(image,p,fundo);
+	}
+      }
     }
   }</code></pre>
 </div>
 </div>
 <div class="paragraph">
-<p>O resultado da execução do programa <a href="/source_codes/regions.cpp">regions.cpp</a> pode ser visto abaixo</p>
-</div>
-<div class="imageblock">
-<div class="content">
-<img src="/image/biel.png" alt="biel">
-</div>
-<div class="title">Figure 2. Imagem utilizada na execução do programa</div>
-</div>
-<div class="imageblock">
-<div class="content">
-<img src="/image/execucaoRegions.png" alt="execucaoRegions">
-</div>
-<div class="title">Figure 3. Pontos informados pelo usuário</div>
-</div>
-<div class="imageblock">
-<div class="content">
-<img src="/image/bielnegativo.png" alt="bielnegativo">
-</div>
-<div class="title">Figure 4. Imagem gerada na saída</div>
-</div>
-</div>
-<div class="sect2">
-<h3 id="_troca_de_regiões">1.2. Troca de Regiões</h3>
-<div class="paragraph">
-<p>Este exercício tem como finalidade colocar em prática o conceito inicial de <strong><em>regiões_de_interesse(roi)</em></strong>, tornando possível criar um programa capaz de realizar a troca dos quadrantes de uma imagem. Neste exemplo, serão criadas 4 regiões de interesse de forma que, ao final do programa possa ser realizada a troca de cada região pela sua diagonal.</p>
-</div>
-<div class="imageblock">
-<div class="content">
-<img src="/image/regioesnomeadas.png" alt="regioesnomeadas">
-</div>
-<div class="title">Figure 5. Divisão das regiões da imagem</div>
-</div>
-<div class="paragraph">
-<p>Inicialmente, realiza-se a leitura de uma imagem a ser processada pelo programa em duas variáveis do tipo <strong><em>Mat</em></strong> distintas, de forma que na primeira serão definidas as regiões de interesse que serão copiadas para a segunda.</p>
+<p>Visto que o fundo da imagem foi pintado no começo do programa, os furos podem ser achados se procurarmos pixels pretos.</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlight"><code class="language-cpp" data-lang="cpp"> image= imread("biel.png",CV_LOAD_IMAGE_GRAYSCALE);
- newImage= imread("biel.png",CV_LOAD_IMAGE_GRAYSCALE);</code></pre>
+<pre class="highlight"><code class="language-cpp" data-lang="cpp">if(image.at&lt;uchar&gt;(i,j) == 0){</code></pre>
 </div>
 </div>
 <div class="paragraph">
-<p><em>Obs: Como a variável <strong>newImage</strong> é igual a <strong>image</strong> também é possível criar uma cópia com a função <strong>clone()</strong>, pois o importante é obtermos uma matriz de dimensões equivalentes a da imagem original para a cópia das regiões</em></p>
-</div>
-<div class="paragraph">
-<p>As regiões de interesse foram definidas utilizando um construtor específico da <a href="https://docs.opencv.org/3.1.0/d3/d63/classcv_1_1Mat.html">Classe Mat</a></p>
+<p>Ao encontrar um pixels preto, é verificado se seu pixel anterior tem cor diferente da cor de fundo, se sim, ele é o primeiro pixel do furos de alguma bolha, senão, ele é uma bolha que recebeu o valor 0 durante a contagem.</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlight"><code class="language-cpp" data-lang="cpp"> Mat (const Mat &amp;m, const Rect &amp;roi)</code></pre>
+<pre class="highlight"><code class="language-cpp" data-lang="cpp">if(image.at&lt;uchar&gt;(i-1,j) !=fundo){//##########
+  furo++;
+  p.x=j;
+  p.y=i;
+  floodFill(image,p,fundo);
+  p.x--;
+  floodFill(image,p,fundo);
+}
+else{
+  p.x=j;
+  p.y=i;
+  floodFill(image,p,fundo);
+}</code></pre>
 </div>
 </div>
-<div class="paragraph">
-<p>que possui como parâmetros, respectivamente, um objeto da classe <em>Mat</em> e um objeto da classe <em>Rect</em>, sendo este último o responsável por informar a região de interesse da imagem <em>m</em>.</p>
-</div>
-<div class="paragraph">
-<p>O primeiro passo é criar quatro objetos da classe <em>Rect</em>, referentes as quatro regiões de interesse da imagem, passando como parâmetros as duas coordenadas <em>x</em> e <em>y</em> que delimitarão a área desejada.</p>
-</div>
-<div class="listingblock">
-<div class="title">Criação da área desejada para a Região de interesse</div>
-<div class="content">
-<pre class="highlight"><code class="language-cpp" data-lang="cpp"> Rect regA(0,0,image.cols/2,image.rows/2);
- Rect regB(image.cols/2,0,image.cols,image.rows/2);
- Rect regC(0,image.rows/2,image.cols/2,image.rows);
- Rect regD(image.cols/2,image.rows/2,image.cols,image.rows);</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>O segundo passo instintivo seria criar os objetos da classe <em>Mat</em> correspondentes as <em>roi</em>. Entretanto ao se executar tal processo a seguinte mensagem de erro será exibida</p>
-</div>
-<div class="imageblock">
-<div class="content">
-<img src="/image/erroMat.png" alt="erroMat">
-</div>
-<div class="title">Figure 6. Erro exibido pelo console</div>
-</div>
-<div class="paragraph">
-<p>referindo-se que a área de interesse está fora dos limites da imagem.</p>
-</div>
-<div class="paragraph">
-<p>Para resolver este problema, deve-se executar os seguintes comandos</p>
-</div>
-<div class="listingblock">
-<div class="title">Ajuste de dimensionalidade</div>
-<div class="content">
-<pre class="highlight"><code class="language-cpp" data-lang="cpp">	regA = regA &amp; Rect(0,0,image.cols,image.rows);
-	regB = regB &amp; Rect(0,0,image.cols,image.rows);
-	regC = regC &amp; Rect(0,0,image.cols,image.rows);
-	regD = regD &amp; Rect(0,0,image.cols,image.rows);</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>que fará com que os retângulos criados sejam ajustados para atender as dimensões da imagem a qual deseja-se extrair as <em>roi</em>.</p>
-</div>
-<div class="paragraph">
-<p>Após realizar os ajustes, procede-se a criação das regiões de interesse em definitivo, utilizando o contrutor da classe <em>Mat</em> como mostra trecho de codigo</p>
-</div>
-<div class="listingblock">
-<div class="title">Criação das Regiões de Interesse</div>
-<div class="content">
-<pre class="highlight"><code class="language-cpp" data-lang="cpp">  Mat roiA(image,regA);
-	Mat roiB(image,regB);
-	Mat roiC(image,regC);
-	Mat roiD(image,regD);</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>O próximo passo é realizar a troca entre os quadrantes da imagem. Para isso, utiliza-se novamente objetos da classe <em>Rect</em> para definir a localização das <em>roi</em> na imagem de destino.
-<em>Obs:Este passo é opcional, considerando que o objeto pode ser passado diretamente no construtor da classe _Mat</em>, tratando-se apenas de uma melhor organização.</p>
-</div>
-<div class="listingblock">
-<div class="title">Definição das regiões de destino</div>
-<div class="content">
-<pre class="highlight"><code class="language-cpp" data-lang="cpp">  Rect whereRecA(image.cols/2,image.rows/2,image.cols,image.rows); // <b class="conum">(1)</b>
-	Rect whereRecB(0,image.rows/2,image.cols/2,image.rows);
-	Rect whereRecC(image.cols/2,0,image.cols,image.rows/2);
-	Rect whereRecD(0,0,image.cols/2,image.rows/2);
-
-	whereRecA = whereRecA &amp; Rect(0,0,image.cols,image.rows); // <b class="conum">(2)</b>
-	whereRecB = whereRecB &amp; Rect(0,0,image.cols,image.rows);
-	whereRecC = whereRecC &amp; Rect(0,0,image.cols,image.rows);
-	whereRecD = whereRecD &amp; Rect(0,0,image.cols,image.rows);</code></pre>
-</div>
-</div>
-<div class="colist arabic">
-<ol>
-<li>
-<p>Definição da região de destino</p>
-</li>
-<li>
-<p>Ajuste de dimensionalidade</p>
-</li>
-</ol>
-</div>
-<div class="imageblock">
-<div class="content">
-<img src="/image/regioestrocadas.png" alt="regioestrocadas">
-</div>
-<div class="title">Figure 7. Esquema de localização das regiões após a troca</div>
-</div>
-<div class="paragraph">
-<p>Com auxílio da função <em>copyTo()</em>, copia-se o conteúdo das quatro <em>roi</em> para a imagem de destino nas posições especificadas</p>
-</div>
-<div class="listingblock">
-<div class="title">Realizando a troca das diagonais</div>
-<div class="content">
-<pre class="highlight"><code class="language-cpp" data-lang="cpp">	roiA.copyTo(newImage(whereRecA));
-	roiB.copyTo(newImage(whereRecB));
-	roiC.copyTo(newImage(whereRecC));
-	roiD.copyTo(newImage(whereRecD));</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>Com a execução do programa <a href="/source_codes/trocaregioes.cpp">trocaregioes.cpp</a> temos a seguinte saída</p>
-</div>
-<div class="imageblock">
-<div class="content">
-<img src="/image/biel.png" alt="biel">
-</div>
-<div class="title">Figure 8. Imagem utilizada na execução do programa</div>
-</div>
-<div class="imageblock">
-<div class="content">
-<img src="/image/saidaRegioes.png" alt="saidaRegioes">
-</div>
-<div class="title">Figure 9. Image gerada após a execução do programa</div>
 </div>
 </div>
 </div>
 </div>
 <div class="sect1">
-<h2 id="_contando_objetos_de_uma_imagem">2. Contando objetos de uma imagem</h2>
+<h2 id="_4_histogramas">4. Histogramas</h2>
 <div class="sectionbody">
-<div class="paragraph">
-<p>O objetivo deste exercício é identificar, em uma imagem passada como entrada, a quantidade de objetos nela presentes. Para tal, desenvolveu-se um algoritmo de rotulação que utilizará o algoritmo <em>floodfill(ou seedfill)</em>. Neste código, trabalharemos com imagens binárias em escala de cinza, isto é, imagens que possuam apenas dois valores possíveis: 0 ou 255, onde o valor <em>"0"</em> representa a ausência de cor e 255 representa a cor do objeto.</p>
-</div>
-<div class="paragraph">
-<p>A rotulação é um processo onde, para cada conglomerado de pixels,com características em comum, encontrado na imagem analisada, será atribuído um valor em comum.</p>
-</div>
-<div class="paragraph">
-<p>O processo de execução do algoritmo <em>floodfill</em> tem como premissa um dado ponto inicial(semente) e que, a partir dele, sairá percorrendo os 4-vizinhos ou 8-zisinhos deste pixel, procurando por outros que possuam característica semelhante a da semente. A definição do modo de busca de vizinhança é definido no início do algoritmo e a imagem abaixo ilustra os métodos de busca</p>
-</div>
-<div class="imageblock">
-<div class="content">
-<img src="/image/vizinhos.png" alt="vizinhos">
-</div>
-<div class="title">Figure 10. Métodos de busca do <em>floodfill</em></div>
-</div>
-<div class="paragraph">
-<p>A semente é criada como um objeto da classe <strong><em>CvPoint</em></strong></p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="highlight"><code class="language-cpp" data-lang="cpp">CvPoint p;</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>que possui duas dimensões, representando as coordenadas x e y da semente. Como deseja-se percorrer toda a imagem, definimos as coordenadas como (0,0) e definimos variáveis para guardar as dimenões da matriz.</p>
-</div>
-<div class="listingblock">
-<div class="title">Definindo a coordenada inicial da semente</div>
-<div class="content">
-<pre class="highlight"><code class="language-cpp" data-lang="cpp">  p.x=0;
-  p.y=0;</code></pre>
-</div>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="highlight"><code class="language-cpp" data-lang="cpp">  width=image.size().width;
-  height=image.size().height;</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>A imagem abaixo será utilizada para execução do programa, de forma que com ela temos alguns desafios, além de apenas contar os objetos.</p>
-</div>
-<div class="imageblock">
-<div class="content">
-<img src="/image/bolhas.png" alt="bolhas">
-</div>
-<div class="title">Figure 11. Imagem a ser analizada</div>
-</div>
-<div class="paragraph">
-<p>O algoritmo deve ser capaz, além de contar a quantidade de objetos, determinar quantos deles possuem buracos e quantos não os possuem. Isso nos leva a ter um cuidado com os objetos que tocam as bordas da imagem, pois não se sabe se estes possuem ou não buracos em sua totalidade.Sendo assim, o algoritmo deve excluí-las do processo antes de começar a procurar por objetos.</p>
-</div>
-<div class="listingblock">
-<div class="title">Remoção dos objetos nas bordas superior e inferior</div>
-<div class="content">
-<pre class="highlight"><code class="language-cpp" data-lang="cpp">  nobjectsborder=0; // <b class="conum">(1)</b>
-	for (int i=0;i&lt;height;i=i+height-1){ // <b class="conum">(2)</b>
-		for(int j=0;j&lt;width;j++){ //<b class="conum">(3)</b>
-			if (image.at&lt;uchar&gt;(i,j) == 255){ // <b class="conum">(4)</b>
-				nobjectsborder++;
-				p.x=j;
-				p.y=i;
-				floodFill(image,p,0); // <b class="conum">(5)</b>
-			}
-		}
-	}</code></pre>
-</div>
-</div>
-<div class="colist arabic">
-<ol>
-<li>
-<p>Contador de objetos presentes nas bordas</p>
-</li>
-<li>
-<p>Laço de duas iterações para varrer a borda superior e inferior</p>
-</li>
-<li>
-<p>Laço para varrer horizontalmente as colunas da matriz <em>image</em></p>
-</li>
-<li>
-<p>Verificação do valor do pixel</p>
-</li>
-<li>
-<p>Chamada da função <em>floodfill</em></p>
-</li>
-</ol>
-</div>
-<div class="listingblock">
-<div class="title">Remoção dos objetos nas bordas laterais</div>
-<div class="content">
-<pre class="highlight"><code class="language-cpp" data-lang="cpp">	for (int i=0;i&lt;height;i++){
-		for(int j=0;j&lt;width;j=j + width -1){
-			if (image.at&lt;uchar&gt;(i,j) == 255){
-				nobjectsborder++;
-				p.x=j;
-				p.y=i;
-				floodFill(image,p,0);
-			}
-		}
-	}</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>A função <em>floodfill</em> recebe como parâmetros,respectivamente, a matriz de pixels da imagem de entrada(<em>image</em>), a semente(<em>p</em>) e o valor a ser atribuído aos píxels com características comuns ao procurado. No caso deste exemplo, atribui-se o valor <em>"0"</em> para que sejam preenchidos com a cor do fundo da imagem.</p>
-</div>
-<div class="paragraph">
-<p>O resultado desta funcionalidade pode ser observado com a execução do arquivo <a href="/source_codes/removeObjBorda.cpp">removeObjBorda.cpp</a></p>
-</div>
-<div class="imageblock">
-<div class="content">
-<img src="/image/labeling.png" alt="labeling">
-</div>
-<div class="title">Figure 12. Imagem de entrada após a remoção dos objetos das bordas</div>
-</div>
-<div class="paragraph">
-<p>Agora podemos voltar a lidar com o problema principal de identificar a quantidade de objetos com e sem buracos. Mas como descobrir se um objeto tem ou não buraco se o algoritmo <em>floodfill</em> procura por pixels de características semelhantes e um buraco é a ausência da cor enquanto o objeto é o valor máximo que o pixel pode assumir?
-Para que isso seja possível, deve-se alterar a cor do fundo da imagem, utilizando o algoritmo <em>floodfill</em>,pois assim ele irá "pintar" apenas a região externa aos objetos e com isso, apenas o interior de objetos com bolhas possuirão valor "0" em seus pixels. Essa tarefa pode ser executada com o trecho de código abaixo.</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="highlight"><code class="language-cpp" data-lang="cpp">	p.x=0;
-	p.y=0;
-	floodFill(image,p,175); // <b class="conum">(1)</b></code></pre>
-</div>
-</div>
-<div class="colist arabic">
-<ol>
-<li>
-<p>Atribuindo o valor "175" como nova cor de fundo</p>
-</li>
-</ol>
-</div>
-<div class="paragraph">
-<p>O resultado pode ser observado com a execução do arquivo <a href="/source_codes/trocafundo.cpp">trocafundo.cpp</a></p>
-</div>
-<div class="imageblock">
-<div class="content">
-<img src="/image/trocafundo.png" alt="trocafundo">
-</div>
-<div class="title">Figure 13. Imagem de entrada após alterar o fundo</div>
-</div>
-<div class="paragraph">
-<p>Com isso, basta executar o algoritmo novamente buscando por pixels com valor "0" e contá-los para termos ciência da quantidade dos que possuem buracos.</p>
-</div>
-<div class="listingblock">
-<div class="title">Buscando pelos buracos dos objetos</div>
-<div class="content">
-<pre class="highlight"><code class="language-cpp" data-lang="cpp">nobjectsholes=0;
-  for(int i=0; i&lt;height; i++){
-    for(int j=0; j&lt;width; j++){
-      if(image.at&lt;uchar&gt;(i,j) == 0){
-		// achou um objeto
-				nobjectsholes++;
-				p.x=j;
-				p.y=i;
-				floodFill(image,p,100);
-	  	}
-		}
-  }</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>Agora é trivial descobrir a quantidade de objetos sem buraco, basta realizar uma busca por pixels com valor "255", isso contará inclusive os que possuem buracos, e em seguida fazer uma subtração entre os valores dos contadores.</p>
-</div>
-<div class="listingblock">
-<div class="title">Contando todos os objetos</div>
-<div class="content">
-<pre class="highlight"><code class="language-cpp" data-lang="cpp">  nobjects=0;
-  for(int i=0; i&lt;height; i++){
-    for(int j=0; j&lt;width; j++){
-      if(image.at&lt;uchar&gt;(i,j) == 255){
-		// achou um objeto
-				nobjects++;
-				p.x=j;
-				p.y=i;
-				floodFill(image,p,nobjects); // <b class="conum">(1)</b>
-	  	}
-		}
-  }
-
-	std::cout&lt;&lt;"com buracos="&lt;&lt;nobjectsholes&lt;&lt;"\nSem buracos="&lt;&lt;(nobjects - nobjectsholes)&lt;&lt;"\n";
-  imshow("image", image);</code></pre>
-</div>
-</div>
-<div class="colist arabic">
-<ol>
-<li>
-<p>Aplicando o processo de rotulação, de forma que cada objeto terá um rótulo</p>
-</li>
-</ol>
-</div>
-<div class="paragraph">
-<p>A execução do algoritmo <a href="/source_codes/labeling2.cpp">labeling2.cpp</a> tem como resultado de saída</p>
-</div>
-<div class="imageblock">
-<div class="content">
-<img src="/image/labeling2saida.png" alt="labeling2saida">
-</div>
-<div class="title">Figure 14. Saída do programa labeling2.cpp</div>
-</div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="_manipulação_de_histogramas">3. Manipulação de Histogramas</h2>
-<div class="sectionbody">
-<div class="paragraph">
-<p>O histograma é uma ferramenta estatística na qual, basicamente, realiza a contagem de cada amostra presente em uma dada população. No contexto de Processamento Digital de Imagens, o histograma conta a ocorrência de cada uma das variações dos valores presentes em cada pixel da imagem desejada.</p>
-</div>
-<div class="paragraph">
-<p>Considerando uma imagem em tons de cinza, em que cada pixel é armazenado em uma variável do tipo <em>unsigned char</em> de <em>8 bits</em>, onde cada pixel pode possuir valores entre 0 e 255, o histograma desta imagem pode ser visto como mostra a imagem abaixo.</p>
-</div>
-<div class="imageblock">
-<div class="content">
-<img src="/image/exemplo_hist.png" alt="exemplo hist">
-</div>
-<div class="title">Figure 15. Exemplo de Histograma de uma imagem</div>
-</div>
 <div class="sect2">
-<h3 id="_equalização">3.1. Equalização</h3>
-<div class="paragraph">
-<p>O processo de equalização depende da obtenção do histograma da imagem, pois tal processo funciona da seguinte maneira: Dado o histograma de uma imagem, normaliza-se o valor obtido para cada um do valor dos pixels de forma a contemplar toda a faixa a qual os pixels poderiam possuir.
-Por exemplo, caso o histograma de uma imagem seja como a a imagem abaixo</p>
-</div>
-<div class="imageblock">
-<div class="content">
-<img src="/image/imghist.png" alt="imghist">
-</div>
-<div class="title">Figure 16. Exemplo de histograma</div>
-</div>
-<div class="paragraph">
-<p>Temos que o valor 45 aparece 10 vezes, 70 aparece 15 vezes, 80 aparece 8 vezes e 95 aparece 5 vezes. No total a imagem possui 38 pixels. O processo de normalização ocorre da seguinte forma</p>
-</div>
-<div class="stemblock">
-<div class="content">
-\[\frac{10}{38}255 = 67\\
-\frac{25}{38}255 = 167 \\
-\frac{33}{38}255 = 221\\
-\frac{38}{38}255 = 255\\\]
-</div>
-</div>
-<div class="paragraph">
-<p>onde, agora, temos os novos valores equalizados dos pixels da imagem original que podem ser representados pelo novo histograma</p>
-</div>
-<div class="imageblock">
-<div class="content">
-<img src="/image/imghistequalized.png" alt="imghistequalized">
-</div>
-<div class="title">Figure 17. Histograma da imagem após a equalização</div>
-</div>
+<h3 id="_4_2_exercício">4.2. Exercício</h3>
 <div class="sect3">
-<h4 id="_programa_equalize_cpp">3.1.1. Programa <em>equalize.cpp</em></h4>
+<h4 id="_4_2_1_equalize_cpp">4.2.1. Equalize.cpp</h4>
 <div class="paragraph">
-<p>No OpenCV dispomos da função <em>calcHist()</em> para a obtenção do histograma de uma dada imagem.</p>
-</div>
-<div class="listingblock">
-<div class="title">Função <em>calcHist()</em></div>
-<div class="content">
-<pre class="highlight"><code class="language-cpp" data-lang="cpp">    void calcHist(const Mat* images, int nimages, const int* channels, InputArray mask, OutputArray hist, int dims, const int* histSize, const float** ranges, bool uniform=true, bool accumulate=false )</code></pre>
-</div>
+<p>Esse exercício vai se propor a equalizar o histograma de uma imagem afim de torna-lo mais destribuído entre os tons de RGB. Os exemplos usados serão link/imagens/cachorro.png e link/imagens/nissan.png e retornarão imagens com o histograma equalizado. Lembrando que a operação de equalização de histograma não retorna obrigatoriamente um resultado melhor que a imagem de entrada, pois algumas imagens precisão de um espaço grande entre os tons ou até tons próximos para que o olho considere mais agradáveis.</p>
 </div>
 <div class="paragraph">
-<p>Esta função tem como parâmetros, respectivamente:</p>
-</div>
-<div class="ulist">
-<ul>
-<li>
-<p>Uma referência para a imagem que se deseja processar;</p>
-</li>
-<li>
-<p>A quantidade de imagens a serem calculadas;</p>
-</li>
-<li>
-<p>Um ponteiro para o array de canais da imagem (0 quando for apenas um canal);</p>
-</li>
-<li>
-<p>Uma máscara da região de onde deseja-se calcular o histograma (para a imagem inteira, indica-se uma matriz vazia);</p>
-</li>
-<li>
-<p>A variável que irá armazenar o histograma;</p>
-</li>
-<li>
-<p>O tamanho da dimensão do histograma;</p>
-</li>
-<li>
-<p>O endereço da quantidade de barras do histograma;</p>
-</li>
-<li>
-<p>Variáveis que informam o comportamento do histograma (uniformidade, cumulativo)</p>
-</li>
-</ul>
-</div>
-<div class="paragraph">
-<p>Ao trabalharmos com imagens coloridas, ou seja, que possuem matrizes representando cada uma das componentes RGB é comum realizar o cálculo do histograma de cada componente de forma separada por ser mais simples, uma vez que, para processar toda a imagem de uma vez seria necessário trabalhar com uma matriz de 256x256x256 elementos. Para realizar a separaçao de cada uma dos componentes utilizamos a função <em>split()</em>.</p>
+<p>O código fonte do programa pode ser visto abaixo: <a href="/codes/equalize.cpp">equalize.cpp</a></p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlight"><code class="language-cpp" data-lang="cpp">split (image, planes);</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>Deve-se criar ainda uma variável para cada histograma</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="highlight"><code class="language-cpp" data-lang="cpp"> Mat histImgR(histh, histw, CV_8UC3, Scalar(0,0,0));
+<pre class="highlight"><code class="language-cpp" data-lang="cpp">//make equalize
+//./equalize imagem.extensão
+#include &lt;iostream&gt;
+#include &lt;opencv2/opencv.hpp&gt;
+
+using namespace cv;
+using namespace std;
+
+int main(int argc, char** argv){
+  Mat image, sv;
+  vector&lt;Mat&gt; planes, svPlanes;
+  Mat histR, histG, histB;
+  Mat histRs, histGs, histBs;
+  int nbins = 64;
+  float range[] = {0, 256};
+  const float *histrange = { range };
+  bool uniform = true;
+  bool acummulate = false;
+
+  int histw = nbins, histh = nbins/2;
+  Mat histImgR(histh, histw, CV_8UC3, Scalar(0,0,0));
   Mat histImgG(histh, histw, CV_8UC3, Scalar(0,0,0));
-  Mat histImgB(histh, histw, CV_8UC3, Scalar(0,0,0));</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>Em seguida prosseguir com o cálculo de cada histograma e normaliza-lo de acordo com o tamanho da imagem onde ele será alocado</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="highlight"><code class="language-cpp" data-lang="cpp">calcHist(&amp;planes[0], 1, 0, Mat(), histR, 1,
+  Mat histImgB(histh, histw, CV_8UC3, Scalar(0,0,0));
+  Mat histImgRs(histh, histw, CV_8UC3, Scalar(0,0,0));//#
+  Mat histImgGs(histh, histw, CV_8UC3, Scalar(0,0,0));
+  Mat histImgBs(histh, histw, CV_8UC3, Scalar(0,0,0));
+
+    image = imread(argv[1], CV_LOAD_IMAGE_COLOR);
+
+    split (image, planes);
+    image.copyTo(sv);
+    split (sv, svPlanes);
+
+    equalizeHist(svPlanes[0], svPlanes[0]);//#
+    equalizeHist(svPlanes[1], svPlanes[1]);
+    equalizeHist(svPlanes[2], svPlanes[2]);
+
+    calcHist(&amp;planes[0], 1, 0, Mat(), histR, 1,
              &amp;nbins, &amp;histrange,
              uniform, acummulate);
     calcHist(&amp;planes[1], 1, 0, Mat(), histG, 1,
@@ -1020,295 +955,198 @@ Por exemplo, caso o histograma de uma imagem seja como a a imagem abaixo</p>
     calcHist(&amp;planes[2], 1, 0, Mat(), histB, 1,
              &amp;nbins, &amp;histrange,
              uniform, acummulate);
+    calcHist(&amp;svPlanes[0], 1, 0, Mat(), histRs, 1,//#
+             &amp;nbins, &amp;histrange,
+             uniform, acummulate);
+    calcHist(&amp;svPlanes[1], 1, 0, Mat(), histGs, 1,
+             &amp;nbins, &amp;histrange,
+             uniform, acummulate);
+    calcHist(&amp;svPlanes[2], 1, 0, Mat(), histBs, 1,
+             &amp;nbins, &amp;histrange,
+             uniform, acummulate);
 
     normalize(histR, histR, 0, histImgR.rows, NORM_MINMAX, -1, Mat());
     normalize(histG, histG, 0, histImgG.rows, NORM_MINMAX, -1, Mat());
     normalize(histB, histB, 0, histImgB.rows, NORM_MINMAX, -1, Mat());
+    normalize(histRs, histRs, 0, histImgRs.rows, NORM_MINMAX, -1, Mat());//#
+    normalize(histGs, histGs, 0, histImgGs.rows, NORM_MINMAX, -1, Mat());
+    normalize(histBs, histBs, 0, histImgBs.rows, NORM_MINMAX, -1, Mat());
 
     histImgR.setTo(Scalar(0));
     histImgG.setTo(Scalar(0));
-    histImgB.setTo(Scalar(0));</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>A imagem abaixo representa a saída do programa <a href="/source_codes/histogram.cpp">histogram.cpp</a></p>
-</div>
-<div class="imageblock">
-<div class="content">
-<img src="/image/exemphist.png" alt="exemphist">
-</div>
-<div class="title">Figure 18. Saída do programa <em>histogram.cpp</em></div>
-</div>
-<div class="paragraph">
-<p>No algoritmo <a href="/source_codes/equalize.cpp">equalize.cpp</a> admite-se que a imagem seja dada em tons de cinza, para isso, após a leitura ler a imagem, mesmo que esta seja colorida utilizamos da função <em>cvtColor()</em> como mostra o trecho abaixo, para converter de RGB para <em>Grayscale</em></p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="highlight"><code class="language-cpp" data-lang="cpp">cvtColor(image,image, CV_BGR2GRAY);</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>O processo de equalização é realizado com o auxílio da função <em>equalizeHist()</em></p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="highlight"><code class="language-cpp" data-lang="cpp">equalizeHist( image,image);</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>A saída do programa <a href="/source_codes/equalize.cpp">equalize.cpp</a> pode ser vista nas imagens abaixo.</p>
-</div>
-<div class="imageblock">
-<div class="content">
-<img src="/image/saidaequalize.png" alt="saidaequalize">
-</div>
-<div class="title">Figure 19. Saída do programa <em>equalize.cpp</em></div>
-</div>
-<div class="imageblock">
-<div class="content">
-<img src="/image/saidaequalizeluz1.png" alt="saidaequalizeluz1">
-</div>
-<div class="title">Figure 20. Saída do programa <em>equalize.cpp</em> com maior iluminação</div>
-</div>
-</div>
-</div>
-<div class="sect2">
-<h3 id="_detecção_de_movimentos">3.2. Detecção de movimentos</h3>
-<div class="paragraph">
-<p>Para desenvolver o algoritmo que permita perceber se houve algum tipo de movimento, será usado como base o código da seção anterior.
-A estratégia utilizada para detectar movimentos será realizar a comparação entre os histogramas de cada frame capturado, comparando o anterior ao seu seguinte até encontrar uma diferença. Esse monitoramento será realizado de forma contínua e o programa mostrará na tela o momento em que o movimento foi detectado, onde serão exibidas duas janelas representando cada um dos frames.</p>
-</div>
-<div class="paragraph">
-<p>Antes de realizar o processo em si é necessário resolver um problema comum em algumas webcams integradas em notebooks que, ao serem iniciadas com o comando <em>cap.open(0)</em> , inciam com uma imagem bem escura e vaõ ajustando o brilho com o passar do tempo. Esse ajuste é necessário, pois se realizarmos a comparaçã ode histogramas a partir do momento em que a câmera é aberta, o próximo frame, com mais brilho, já terá uma diferença em seu histograma.</p>
-</div>
-<div class="paragraph">
-<p>Para evitar este problema adotou-se uma estratégia simples: criar um contador que, após o dispositivo de vídeo ser aberto, realizar 40 execuçoes do algoritmo, ou seja, realizar o cálculo do histograma dos 40 primeiros frames sem realizar qualquer tipo de comparação e, a partir do frame 41, onde a câmera já está com seu brilho devidamente ajustado, habilitar a região do código que executa a comparação entre frames.</p>
-</div>
-<div class="listingblock">
-<div class="title">Região do código responsável pela comparação de histogramas</div>
-<div class="content">
-<pre class="highlight"><code class="language-cpp" data-lang="cpp">cont++;
-if(cont&gt;36)cout&lt;&lt;"MOVE!!!!\n";
-if(cont&gt;=40){
-	if(histR_old.empty()==true){
-		histR_old = histR.clone();
-		image_old=image.clone();
-	}
-	else{
-		double histCorrelation = compareHist( histR, histR_old, CV_COMP_CHISQR);
-		cout&lt;&lt;histCorrelation&lt;&lt;"\n";
-		if(histCorrelation &gt; 75){
-			alarm=1;
-			hconcat(image_old,image,image);
-			cout&lt;&lt;"ALERT, DETECTED!!!\n";
-			imshow("image", image);
-      if(waitKey(10000) &gt;= 0) break;
-		}
-	}</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>A função <a href="https://docs.opencv.org/2.4.13.7/doc/tutorials/imgproc/histograms/histogram_comparison/histogram_comparison.html">compareHist()</a>, Própria do openCV realiza os cálculos de diferença entre os histogramas e possui três argumentos: Os dois histogramas a serem comparados e o método utilizado para tal. Os métodos aceitos para comparação são a Correlação, Distância Qui-quadrada, Interseção e Distância Bhattacharyya. No código desenvolvido utilizou-se  a Distância Qui-quadrada (CV_COMP_CHISQR), pois dentre os modelos disponíveis foi o que melhor se adequou a proposta.</p>
-</div>
-<div class="imageblock">
-<div class="content">
-<img src="/image/dist.png" alt="dist">
-</div>
-<div class="title">Figure 21. Equação da Distância Qui-quadrada</div>
-</div>
-<div class="paragraph">
-<p>Um exemplo do funcionamento do programa <a href="/source_codes/motiondetector.cpp">motiondetector.cpp</a> pode ser visto no vídeo abaixo:</p>
-</div>
-<div class="videoblock">
-<div class="title">Execução do programa <em>motiondetector.cpp</em></div>
-<div class="content">
-<iframe src="https://www.youtube.com/embed/_sl0xxIOKLU?rel=0" frameborder="0" allowfullscreen></iframe>
-</div>
-</div>
-</div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="_filtro_espacial">4. Filtro espacial</h2>
-<div class="sectionbody">
-<div class="paragraph">
-<p>A filtragem espacial no contexto de Processamento Digital de Sinais trata-se do processo de convolução digital da matriz que representa a imagem e de uma máscara que representa o efeito do filtro desejado.</p>
-</div>
-<div class="sect2">
-<h3 id="_filtro_laplaciano_do_gaussiano">4.1. Filtro Laplaciano do Gaussiano</h3>
-<div class="paragraph">
-<p>O programa desenvolvido utiliza como base o código <a href="https://agostinhobritojr.github.io/tutorial/pdi/exemplos/filtroespacial.cpp">filtroespacial.cpp</a>, disponibilizado pelo Prof. Agostinho em sua página do Github.</p>
-</div>
-<div class="paragraph">
-<p>O programa base utiliza da convolução digital para realizar alguns processos de filtragem: Filtro da média, Gaussiana, Horizontal, Absoluto, Vertical e Laplaciano.</p>
-</div>
-<div class="listingblock">
-<div class="title">Matrizes utilizadas para os filtros</div>
-<div class="content">
-<pre class="highlight"><code class="language-cpp" data-lang="cpp">float media[] = {1,1,1,
-				   1,1,1,
-				   1,1,1};
-float gauss[] = {1,2,1,
-				   2,4,2,
-				   1,2,1};
-float horizontal[]={-1,0,1,
-					  -2,0,2,
-					  -1,0,1};
-float vertical[]={-1,-2,-1,
-					0,0,0,
-					1,2,1};
-float laplacian[]={0,-1,0,
-					 -1,4,-1,
-					 0,-1,0};</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>Dentro do programa, após selecionar o tipo de filtro a ser aplicado, a matriz correspondete será transformada em uma máscara, que será utilizada no processo de filtagem ddo frame capturado pela câmera. O trecho de código abaixo demonstra o uso do construtor da classe <a href="https://docs.opencv.org/3.1.0/d3/d63/classcv_1_1Mat.html"><em>Mat()</em></a> para definir a máscara.</p>
-</div>
-<div class="listingblock">
-<div class="title">Criando a máscara do filtro</div>
-<div class="content">
-<pre class="highlight"><code class="language-cpp" data-lang="cpp">mask = Mat(3, 3, CV_32F, laplacian);</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>O algoritmo possui um laço de repetição que sempre captura o frame do dispositivo de imagem, no caso a webcam integrada, e aplica a máscara selecionada. A seleção do tipo de filtro é realizado no momento em que o usuário informa uma letra com mostra o esquema abaixo.</p>
-</div>
-<div class="listingblock">
-<div class="title">Menu apresentando ao usuário para escolha do filtro</div>
-<div class="content">
-<pre class="highlight"><code class="language-cpp" data-lang="cpp">void menu(){
-  cout &lt;&lt; "\npressione a tecla para ativar o filtro: \n"
-	"a - calcular modulo\n"
-	"m - media\n"
-	"g - gauss\n"
-	"v - vertical\n"
-	"h - horizontal\n"
-	"l - laplaciano\n"
-	"x - laplaciano gaussiano\n"
-	"esc - sair\n";
+    histImgB.setTo(Scalar(0));
+    histImgRs.setTo(Scalar(0));//#
+    histImgGs.setTo(Scalar(0));
+    histImgBs.setTo(Scalar(0));
+
+    for(int i=0; i&lt;nbins; i++){
+      line(histImgR,
+           Point(i, histh),
+           Point(i, histh-cvRound(histR.at&lt;float&gt;(i))),
+           Scalar(0, 0, 255), 1, 8, 0);
+      line(histImgG,
+           Point(i, histh),
+           Point(i, histh-cvRound(histG.at&lt;float&gt;(i))),
+           Scalar(0, 255, 0), 1, 8, 0);
+      line(histImgB,
+           Point(i, histh),
+           Point(i, histh-cvRound(histB.at&lt;float&gt;(i))),
+           Scalar(255, 0, 0), 1, 8, 0);
+      line(histImgRs,
+           Point(i, histh),
+           Point(i, histh-cvRound(histRs.at&lt;float&gt;(i))),
+           Scalar(0, 0, 255), 1, 8, 0);//#
+      line(histImgGs,
+           Point(i, histh),
+           Point(i, histh-cvRound(histGs.at&lt;float&gt;(i))),
+           Scalar(0, 255, 0), 1, 8, 0);
+      line(histImgBs,
+           Point(i, histh),
+           Point(i, histh-cvRound(histBs.at&lt;float&gt;(i))),
+           Scalar(255, 0, 0), 1, 8, 0);
+    }
+
+    merge(svPlanes, sv);
+
+    histImgR.copyTo(image(Rect(0, 0      , nbins, histh)));
+    histImgG.copyTo(image(Rect(0, histh  , nbins, histh)));
+    histImgB.copyTo(image(Rect(0, 2*histh, nbins, histh)));
+    histImgRs.copyTo(sv(Rect(0, 0      , nbins, histh)));
+    histImgGs.copyTo(sv(Rect(0, histh  , nbins, histh)));
+    histImgBs.copyTo(sv(Rect(0, 2*histh, nbins, histh)));
+    imshow("image", image);
+    imshow("sv", sv);
+    imwrite("imagem.png", sv);
+    if(waitKey(-1));
+
+  return 0;
 }</code></pre>
 </div>
 </div>
+<div class="paragraph">
+<p>Para compilar e executar o programa usamos os comandos abaixo substituindo imagem.png pelo nome da imagem que terá o histograma equalizado</p>
+</div>
 <div class="listingblock">
-<div class="title">Trecho responsável pela filtragem ao escolher a opção 'l'</div>
 <div class="content">
-<pre class="highlight"><code class="language-cpp" data-lang="cpp">case 'l':
-		menu();
-		mask = Mat(3, 3, CV_32F, laplacian);
-		printmask(mask);
-		filter2D(frame32f, frameFiltered,
-		frame32f.depth(), mask, Point(1,1), 0);
-		if(absolut){
-			frameFiltered=abs(frameFiltered);
-		}
-		frameFiltered.convertTo(result, CV_8U);
-		break;</code></pre>
+<pre class="highlight"><code class="language-markdown" data-lang="markdown">make equalize
+./equalize imagem.extensão</code></pre>
 </div>
 </div>
 <div class="paragraph">
-<p>No código desenvolvido pelo autor, era necessário criar um novo filtro: Laplaciano do Gaussiano, que corresponde a aplicar primeiro o filtro Gaussiano e aplicar o filtro laplaciano no resultado.
-No código base, o processo de filtragem utilizando a função <a href="https://docs.opencv.org/2.4.13.7/doc/tutorials/imgproc/imgtrans/filter_2d/filter_2d.html"><em>filter2D()</em></a> ocorre dentro de cada <strong><em>case</em></strong>. Para realizar os filtros em cadeia, alterou-se o código de forma que o processo de filtragem ocorra sempre no início do <em>loop</em> e cada condicional é responsável por definir a variável <strong><em>mask</em></strong> a ser usada no filtro. Com isso, os condicionais possuem formato semelhante ao trecho de código</p>
-</div>
-<div class="listingblock">
-<div class="title">Criação da máscara ao selecionar a opção 'l'</div>
-<div class="content">
-<pre class="highlight"><code class="language-cpp" data-lang="cpp">case 'l':
-		menu();
-		lapgauss=0;
-		mask = Mat(3, 3, CV_32F, laplacian);
-		printmask(mask);
-		break;</code></pre>
-</div>
+<p>Usando como imagem de entrada o <a href="/imagens/cachorro.jpeg"><strong><em>Catiolo</em></strong></a></p>
 </div>
 <div class="paragraph">
-<p>A variável <em>lapgauss</em> funciona como uma flag para indicar se o filtro Laplaciano do Gaussiano está sendo utilizado. O valor 0 indica que não está em uso e o valor 1 indica o uso. Tal variável é necessária pois, como aplica-se filtros em cadeia a definição da máscara deste tipo de filtro está representado no código abaixo.</p>
-</div>
-<div class="listingblock">
-<div class="title">Criação da mpascara ao selecionar a opção 'x'</div>
-<div class="content">
-<pre class="highlight"><code class="language-cpp" data-lang="cpp">case 'x':
-		menu();
-		lapgauss=1;
-		mask = Mat(3, 3, CV_32F, gauss);
-		scaleAdd(mask, 1/16.0, Mat::zeros(3,3,CV_32F), mask1);
-		mask = mask1;
-		filter2D(frame32f, frameFiltered,frame32f.depth(), mask, Point(1,1), 0);
-		mask = Mat(3, 3, CV_32F, laplacian);
-		filter2D(frameFiltered, frameFilteredLapGauss,frameFiltered.depth(), mask, Point(1,1), 0);
-		break;</code></pre>
-</div>
+<p><span class="image"><img src="/imagens/cachorro.jpeg" alt="Cachorro"></span></p>
 </div>
 <div class="paragraph">
-<p>Os inicíos dos laços de repetição dos códigos <a href="https://agostinhobritojr.github.io/tutorial/pdi/exemplos/filtroespacial.cpp">base</a> e do <a href="/source_codes/lapgauss.cpp">lapgauss.cpp</a> podem ser vistos nos trechos abaixo.</p>
+<p>e executando o programa, obtemos uma imagem equalizada mais realista <a href="/imagens/cachorroeq.png"><strong><em>Cariolo Equalizado</em></strong></a></p>
+</div>
+<div class="paragraph">
+<p><span class="image"><img src="/imagens/cachorroeq.png" alt="Cachorro Equalizada"></span></p>
+</div>
+<div class="paragraph">
+<p>Usando como imagem de entrada o <a href="/imagens/carro.jpg"><strong><em>Carrão</em></strong></a></p>
+</div>
+<div class="paragraph">
+<p><span class="image"><img src="/imagens/carro.jpg" alt="Carro"></span></p>
+</div>
+<div class="paragraph">
+<p>e executando o programa, obtemos uma imagem equalizada não tão agradável chegando até a mudar a cor do carro <a href="/imagens/carroeq.png"><strong><em>Carrão Equalizado</em></strong></a></p>
+</div>
+<div class="paragraph">
+<p><span class="image"><img src="/imagens/carroeq.png" alt="Cachorro Equalizada"></span></p>
+</div>
+<div class="paragraph">
+<p>O programa se inicia com as declarações de histogramas e imagens junto com a cópia da imagem para fins de comparação, depois disso a imagem é separada nos canais RGB</p>
 </div>
 <div class="listingblock">
-<div class="title">Inicio do loop no código <em>filtroespacial.cpp</em></div>
 <div class="content">
-<pre class="highlight"><code class="language-cpp" data-lang="cpp">menu();
-	for(;;){
-		video &gt;&gt; cap;
-		cvtColor(cap, frame, CV_BGR2GRAY);
-		flip(frame, frame, 1);
-		imshow("original", frame);
-		frame.convertTo(frame32f, CV_32F);
-		imshow("filtroespacial", result);
-		key = (char) waitKey(10);
-		if( key == 27 ) break; // esc pressed!
-		switch(key){</code></pre>
-</div>
-</div>
-<div class="listingblock">
-<div class="title">Inicio do loop no código <em>lapgausse.cpp</em></div>
-<div class="content">
-<pre class="highlight"><code class="language-cpp" data-lang="cpp">menu();
-	for(;;){
-		video &gt;&gt; cap;
-    cvtColor(cap, frame, CV_BGR2GRAY);
-    flip(frame, frame, 1);
-    imshow("original", frame);
-		frame.convertTo(frame32f, CV_32F);
-		if(lapgauss!=0){
-			if(absolut){
-      	frameFilteredLapGauss=abs(frameFilteredLapGauss);
-    	}
-    	frameFilteredLapGauss.convertTo(result, CV_8U);
-			imshow("filtroespacial", result);
-		}
-		else{
-    	filter2D(frame32f, frameFiltered,frame32f.depth(), mask, Point(1,1), 0);
-    	if(absolut){
-      	frameFiltered=abs(frameFiltered);
-    	}
-    	frameFiltered.convertTo(result, CV_8U);
-			imshow("filtroespacial", result);
-		}
+<pre class="highlight"><code class="language-cpp" data-lang="cpp">  Mat image, sv;
+  vector&lt;Mat&gt; planes, svPlanes;
+  Mat histR, histG, histB;
+  Mat histRs, histGs, histBs;
+  int nbins = 64;
+  float range[] = {0, 256};
+  const float *histrange = { range };
+  bool uniform = true;
+  bool acummulate = false;
 
-    key = (char) waitKey(10);
-    if( key == 27 ) break; // esc pressed!
-    switch(key){</code></pre>
+  int histw = nbins, histh = nbins/2;
+  Mat histImgR(histh, histw, CV_8UC3, Scalar(0,0,0));
+  Mat histImgG(histh, histw, CV_8UC3, Scalar(0,0,0));
+  Mat histImgB(histh, histw, CV_8UC3, Scalar(0,0,0));
+  Mat histImgRs(histh, histw, CV_8UC3, Scalar(0,0,0));//#
+  Mat histImgGs(histh, histw, CV_8UC3, Scalar(0,0,0));
+  Mat histImgBs(histh, histw, CV_8UC3, Scalar(0,0,0));
+
+  image = imread(argv[1], CV_LOAD_IMAGE_COLOR);
+
+  split (image, planes);
+  image.copyTo(sv);
+  split (sv, svPlanes);</code></pre>
 </div>
 </div>
 <div class="paragraph">
-<p>A execução do programa e comparação do resultados dos filtros pode ser vista nas imagens abaixo.</p>
+<p>e em seguida o programa realiza a equalização do histograma da imagem e o calculo dos histogramas da imagem equalizada e da original, seguidos pela normalização e criação da imagem dos histogramas</p>
 </div>
-<div class="imageblock">
+<div class="listingblock">
 <div class="content">
-<img src="/image/filtrooriginal.png" alt="filtrooriginal">
+<pre class="highlight"><code class="language-cpp" data-lang="cpp">  equalizeHist(svPlanes[0], svPlanes[0]);
+  equalizeHist(svPlanes[1], svPlanes[1]);
+  equalizeHist(svPlanes[2], svPlanes[2]);
+
+  calcHist(&amp;planes[0], 1, 0, Mat(), histR, 1, &amp;nbins, &amp;histrange, uniform, acummulate);
+  calcHist(&amp;planes[1], 1, 0, Mat(), histG, 1, &amp;nbins, &amp;histrange, uniform, acummulate);
+  calcHist(&amp;planes[2], 1, 0, Mat(), histB, 1, &amp;nbins, &amp;histrange, uniform, acummulate);
+  calcHist(&amp;svPlanes[0], 1, 0, Mat(), histRs, 1, &amp;nbins, &amp;histrange, uniform, acummulate);
+  calcHist(&amp;svPlanes[1], 1, 0, Mat(), histGs, 1, &amp;nbins, &amp;histrange, uniform, acummulate);
+  calcHist(&amp;svPlanes[2], 1, 0, Mat(), histBs, 1, &amp;nbins, &amp;histrange, uniform, acummulate);
+
+  normalize(histR, histR, 0, histImgR.rows, NORM_MINMAX, -1, Mat());
+  normalize(histG, histG, 0, histImgG.rows, NORM_MINMAX, -1, Mat());
+  normalize(histB, histB, 0, histImgB.rows, NORM_MINMAX, -1, Mat());
+  normalize(histRs, histRs, 0, histImgRs.rows, NORM_MINMAX, -1, Mat());
+  normalize(histGs, histGs, 0, histImgGs.rows, NORM_MINMAX, -1, Mat());
+  normalize(histBs, histBs, 0, histImgBs.rows, NORM_MINMAX, -1, Mat());
+
+  histImgR.setTo(Scalar(0));
+  histImgG.setTo(Scalar(0));
+  histImgB.setTo(Scalar(0));
+  histImgRs.setTo(Scalar(0));
+  histImgGs.setTo(Scalar(0));
+  histImgBs.setTo(Scalar(0));</code></pre>
 </div>
-<div class="title">Figure 22. Imagem original capturada</div>
 </div>
-<div class="imageblock">
+<div class="paragraph">
+<p>Por fim, os histogramas são desenhados e copiados para dentro da imagem</p>
+</div>
+<div class="listingblock">
 <div class="content">
-<img src="/image/filtrolap.png" alt="filtrolap">
+<pre class="highlight"><code class="language-cpp" data-lang="cpp">  for(int i=0; i&lt;nbins; i++){
+    line(histImgR, Point(i, histh), Point(i, histh-cvRound(histR.at&lt;float&gt;(i))),
+         Scalar(0, 0, 255), 1, 8, 0);
+    line(histImgG, Point(i, histh), Point(i, histh-cvRound(histG.at&lt;float&gt;(i))),
+         Scalar(0, 255, 0), 1, 8, 0);
+    line(histImgB, Point(i, histh), Point(i, histh-cvRound(histB.at&lt;float&gt;(i))),
+         Scalar(255, 0, 0), 1, 8, 0);
+    line(histImgRs, Point(i, histh), Point(i, histh-cvRound(histRs.at&lt;float&gt;(i))),
+         Scalar(0, 0, 255), 1, 8, 0);
+    line(histImgGs, Point(i, histh), Point(i, histh-cvRound(histGs.at&lt;float&gt;(i))),
+         Scalar(0, 255, 0), 1, 8, 0);
+    line(histImgBs, Point(i, histh), Point(i, histh-cvRound(histBs.at&lt;float&gt;(i))),
+         Scalar(255, 0, 0), 1, 8, 0);
+  }
+
+  merge(svPlanes, sv);
+
+  histImgR.copyTo(image(Rect(0, 0      , nbins, histh)));
+  histImgG.copyTo(image(Rect(0, histh  , nbins, histh)));
+  histImgB.copyTo(image(Rect(0, 2*histh, nbins, histh)));
+  histImgRs.copyTo(sv(Rect(0, 0      , nbins, histh)));
+  histImgGs.copyTo(sv(Rect(0, histh  , nbins, histh)));
+  histImgBs.copyTo(sv(Rect(0, 2*histh, nbins, histh)));</code></pre>
 </div>
-<div class="title">Figure 23. Aplicação do filtro Laplaciano</div>
 </div>
-<div class="imageblock">
-<div class="content">
-<img src="/image/filtrolapgauss.png" alt="filtrolapgauss">
-</div>
-<div class="title">Figure 24. Aplicação do filtro Laplaciano do Gaussiano</div>
 </div>
 </div>
 </div>
@@ -1316,32 +1154,8 @@ No código base, o processo de filtragem utilizando a função <a href="https://
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2019-04-10 12:00:07 -0300
+Last updated 2019-04-25 18:17:41 -0300
 </div>
 </div>
-<script type="text/x-mathjax-config">
-MathJax.Hub.Config({
-  messageStyle: "none",
-  tex2jax: {
-    inlineMath: [["\\(", "\\)"]],
-    displayMath: [["\\[", "\\]"]],
-    ignoreClass: "nostem|nolatexmath"
-  },
-  asciimath2jax: {
-    delimiters: [["\\$", "\\$"]],
-    ignoreClass: "nostem|noasciimath"
-  },
-  TeX: { equationNumbers: { autoNumber: "none" } }
-})
-MathJax.Hub.Register.StartupHook("AsciiMath Jax Ready", function () {
-  MathJax.InputJax.AsciiMath.postfilterHooks.Add(function (data, node) {
-    if ((node = data.script.parentNode) && (node = node.parentNode) && node.classList.contains('stemblock')) {
-      data.math.root.display = "block"
-    }
-    return data
-  })
-})
-</script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_HTMLorMML"></script>
 </body>
 </html>
